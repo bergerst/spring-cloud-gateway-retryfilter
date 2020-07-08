@@ -28,6 +28,7 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -40,7 +41,8 @@ public class RetryFilterTest {
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
       RetryGatewayFilterFactory factory = new RetryGatewayFilterFactory();
-      OrderedGatewayFilter filter = new OrderedGatewayFilter(factory.apply(new RetryConfig()), 1);
+      OrderedGatewayFilter filter = new OrderedGatewayFilter(factory.apply(new RetryConfig()
+          .setStatuses(HttpStatus.SERVICE_UNAVAILABLE).allMethods().setRetries(1).setSeries()), 1);
 
       return builder.routes()
           .route(spec -> spec.path("/test").and().method(HttpMethod.GET)
