@@ -15,6 +15,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 
 import com.example.retry.RetryFilterTest.RouteConfiguration;
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,7 +58,7 @@ public class RetryFilterTest {
   public void testRetry() {
     stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(503)));
 
-    webClient.get().uri("/test").exchange();
+    webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
 
     verify(4, getRequestedFor(urlEqualTo("/test")));
   }
