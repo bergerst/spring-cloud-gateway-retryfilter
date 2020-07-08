@@ -9,10 +9,8 @@ package com.example.retry;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 
 import com.example.retry.RetryFilterTest.RouteConfiguration;
 import org.apache.http.HttpHeaders;
@@ -55,12 +53,17 @@ public class RetryFilterTest {
   private WebTestClient webClient;
 
   @Test
-  public void testRetry() {
+  public void testRetry() throws InterruptedException {
     stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(503)));
 
-    webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
+    var response =
+        webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
+    response.expectStatus().isEqualTo(503);
 
-    verify(4, getRequestedFor(urlEqualTo("/test")));
+    Thread.sleep(10000);
+
+    stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(200)));
+    response = webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
+    response.expectStatus().isEqualTo(200);
   }
-
 }
