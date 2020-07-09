@@ -65,8 +65,10 @@ public class RetryFilterTest {
   public void testRetry() throws InterruptedException {
     stubFor(get(urlEqualTo("/test2")).willReturn(aResponse().withStatus(503)));
 
-    var response =
-        webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
-    response.expectStatus().isEqualTo(503);
+    for (int i = 0; i < 100000; ++i) {
+      var response =
+          webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
+      response.expectStatus().isEqualTo(503);
+    }
   }
 }
