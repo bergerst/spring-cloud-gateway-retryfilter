@@ -28,7 +28,6 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -41,8 +40,8 @@ public class RetryFilterTest {
     @Bean
     public RouteLocator routeLocator(RouteLocatorBuilder builder) {
       RetryGatewayFilterFactory factory = new RetryGatewayFilterFactory();
-      OrderedGatewayFilter retryFilter = new OrderedGatewayFilter(factory.apply(new RetryConfig()
-          .setStatuses(HttpStatus.SERVICE_UNAVAILABLE).allMethods().setRetries(1).setSeries()), 1);
+      OrderedGatewayFilter retryFilter =
+          new OrderedGatewayFilter(factory.apply(new RetryConfig().setRetries(1)), 1);
 
       return builder.routes()
           .route(spec -> spec.path("/test").and().method(HttpMethod.GET)
@@ -58,7 +57,7 @@ public class RetryFilterTest {
   public void testRetry() throws InterruptedException {
     stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(503)));
 
-    for (int i = 0; i < 100; ++i) {
+    for (int i = 0; i < 5; ++i) {
       var response =
           webClient.get().uri("/test").header(HttpHeaders.CONTENT_TYPE, "text/xml").exchange();
       response.expectStatus().isEqualTo(503);
