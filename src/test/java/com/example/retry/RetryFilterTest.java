@@ -1,10 +1,3 @@
-/******************************************************
- * Copyright © x-tention Informationstechnologie GmbH
- * <a href="mailto:office@x-tention.at">office@x-tention.at</a> Dieses File ist Bestandteil des
- * Projektes elektronische Patientenakte AOK. Dieses File darf nicht kopiert und/oder verteilt
- * werden.
- *******************************************************/
-
 package com.example.retry;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
