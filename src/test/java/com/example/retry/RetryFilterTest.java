@@ -56,7 +56,7 @@ public class RetryFilterTest {
 
   @Test
   public void testRetry() throws InterruptedException {
-    stubFor(get(urlEqualTo("/test2")).willReturn(aResponse().withStatus(503)));
+    stubFor(get(urlEqualTo("/test")).willReturn(aResponse().withStatus(503)));
 
     for (int i = 0; i < 100000; ++i) {
       var response =
