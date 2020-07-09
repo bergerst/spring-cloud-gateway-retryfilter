@@ -23,8 +23,6 @@ import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.RetryGatewayFilterFactory;
 import org.springframework.cloud.gateway.filter.factory.RetryGatewayFilterFactory.RetryConfig;
-import org.springframework.cloud.gateway.filter.factory.RewritePathGatewayFilterFactory;
-import org.springframework.cloud.gateway.filter.factory.RewritePathGatewayFilterFactory.Config;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -46,14 +44,9 @@ public class RetryFilterTest {
       OrderedGatewayFilter retryFilter = new OrderedGatewayFilter(factory.apply(new RetryConfig()
           .setStatuses(HttpStatus.SERVICE_UNAVAILABLE).allMethods().setRetries(1).setSeries()), 1);
 
-      RewritePathGatewayFilterFactory rewriteFactory = new RewritePathGatewayFilterFactory();
-      OrderedGatewayFilter rewriteFilter = new OrderedGatewayFilter(
-          rewriteFactory.apply(new Config().setRegexp("/test").setReplacement("/test2")), 6);
-
       return builder.routes()
           .route(spec -> spec.path("/test").and().method(HttpMethod.GET)
-              .filters(f -> f.filters(retryFilter, rewriteFilter)).uri("http://localhost:64324")
-              .id("retry-test"))
+              .filters(f -> f.filters(retryFilter)).uri("http://localhost:64324").id("retry-test"))
           .build();
     }
   }
